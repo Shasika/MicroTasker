@@ -119,3 +119,27 @@ small.muted { color: var(--muted); }
   .wrap { padding-left: 12px; padding-right: 12px; }
   .toolbar > div { width: 100%; }
 }
+
+
+/* Jira-like board */
+.board-header { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:10px; }
+.board-title { margin:0; font-size:22px; letter-spacing:-0.02em; }
+.board-sub { color:var(--muted); font-size:13px; }
+.filters-bar { background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:12px; }
+.board-scroll { overflow-x:auto; padding-bottom:8px; }
+.kanban { display:flex; gap:12px; min-width:980px; }
+.lane { width:320px; background:#f8fafc; border:1px solid #dbe4ef; border-radius:14px; padding:10px; }
+.lane-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.lane-title { font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:#334155; }
+.lane-count { font-size:12px; background:#e2e8f0; color:#334155; border-radius:999px; padding:2px 8px; }
+.jira-card { background:#fff; border:1px solid #dbe4ef; border-left:4px solid #93c5fd; border-radius:10px; padding:10px; margin-bottom:8px; box-shadow:0 3px 12px rgba(15,23,42,.06); }
+.jira-card.high { border-left-color:#f87171; }
+.jira-card.med { border-left-color:#f59e0b; }
+.jira-card.low { border-left-color:#34d399; }
+.jira-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:6px; }
+.jira-actions { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
+.inline-form { margin:0; }
+@media (max-width: 760px) {
+  .kanban { min-width:unset; }
+  .lane { min-width:280px; width:85vw; }
+}

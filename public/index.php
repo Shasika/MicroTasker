@@ -597,52 +597,52 @@ $members = $membersStmt->fetchAll();
 
 ob_start();
 ?>
-<div class="toolbar">
+<div class="board-header">
   <div>
-    <h2 style="margin:0">Today Board</h2>
-    <small class="muted">Due today · fast updates · team-focused</small>
+    <h2 class="board-title">Today Board</h2>
+    <div class="board-sub">Jira-style lanes · quick triage · owner visibility</div>
   </div>
   <a class="btn secondary" href="/?page=summary">Team Summary</a>
 </div>
 
-<section class="card" style="margin:10px 0 12px;">
+<section class="filters-bar">
   <form method="get" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));align-items:end;">
     <input type="hidden" name="page" value="today" />
-    <label><small class="muted">Scope</small><select name="mine"><option value="">All tasks</option><option value="1" <?= $mine ? 'selected' : '' ?>>My tasks</option></select></label>
-    <label><small class="muted">Status</small><select name="status"><option value="">Any</option><?php foreach (['todo', 'doing', 'done'] as $status): ?><option value="<?= $status ?>" <?= $statusFilter === $status ? 'selected' : '' ?>><?= $status ?></option><?php endforeach; ?></select></label>
-    <label><small class="muted">Priority</small><select name="priority"><option value="">Any</option><?php foreach (['low', 'med', 'high'] as $priority): ?><option value="<?= $priority ?>" <?= $priorityFilter === $priority ? 'selected' : '' ?>><?= $priority ?></option><?php endforeach; ?></select></label>
-    <button class="btn secondary" type="submit">Apply</button>
+    <label><small class="muted">Assignee</small><select name="mine"><option value="">All tasks</option><option value="1" <?= $mine ? 'selected' : '' ?>>Assigned to me</option></select></label>
+    <label><small class="muted">Status</small><select name="status"><option value="">Any lane</option><?php foreach (['todo', 'doing', 'done'] as $status): ?><option value="<?= $status ?>" <?= $statusFilter === $status ? 'selected' : '' ?>><?= $status ?></option><?php endforeach; ?></select></label>
+    <label><small class="muted">Priority</small><select name="priority"><option value="">Any priority</option><?php foreach (['low', 'med', 'high'] as $priority): ?><option value="<?= $priority ?>" <?= $priorityFilter === $priority ? 'selected' : '' ?>><?= $priority ?></option><?php endforeach; ?></select></label>
+    <button class="btn secondary" type="submit">Apply filters</button>
   </form>
 </section>
 
-<div class="grid cols-3">
-  <?php foreach (['todo' => 'To do', 'doing' => 'Doing', 'done' => 'Done'] as $statusKey => $statusLabel): ?>
-    <section class="card">
-      <h3><?= h($statusLabel) ?> <small class="muted">(<?= count($grouped[$statusKey]) ?>)</small></h3>
+<div class="board-scroll">
+  <div class="kanban">
+  <?php foreach (['todo' => 'To do', 'doing' => 'In progress', 'done' => 'Done'] as $statusKey => $statusLabel): ?>
+    <section class="lane">
+      <div class="lane-head"><span class="lane-title"><?= h($statusLabel) ?></span><span class="lane-count"><?= count($grouped[$statusKey]) ?></span></div>
       <?php if (!$grouped[$statusKey]): ?>
-        <div class="empty">
-          <div class="skeleton" style="margin-bottom:8px;"></div>
-          <div class="skeleton" style="width:70%;margin:0 auto 8px;"></div>
-          No tasks in this lane.
-        </div>
+        <div class="empty">No issues in this lane.</div>
       <?php endif; ?>
 
       <?php foreach ($grouped[$statusKey] as $task): ?>
-        <article class="task-card">
-          <div style="display:flex;justify-content:space-between;gap:8px;">
+        <article class="jira-card <?= h($task['priority']) ?>">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
             <strong><?= h($task['title']) ?></strong>
-            <span class="badge <?= $task['priority'] === 'high' ? 'danger' : ($task['priority'] === 'med' ? 'warn' : 'success') ?>"><?= h($task['priority']) ?></span>
+            <span class="badge <?= $task['priority'] === 'high' ? 'danger' : ($task['priority'] === 'med' ? 'warn' : 'success') ?>"><?= strtoupper(h($task['priority'])) ?></span>
           </div>
-          <small class="muted">Assignee: <?= h($task['assignee'] ?: 'Unassigned') ?></small>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
-            <form method="post" action="/?page=task_quick">
+          <div class="jira-meta">
+            <small class="muted">#<?= (int) $task['id'] ?> · <?= h($task['assignee'] ?: 'Unassigned') ?></small>
+            <small class="muted"><?= h($task['due_date']) ?></small>
+          </div>
+          <div class="jira-actions">
+            <form class="inline-form" method="post" action="/?page=task_quick">
               <input type="hidden" name="_token" value="<?= h(csrfToken()) ?>" />
               <input type="hidden" name="task_id" value="<?= (int) $task['id'] ?>" />
               <input type="hidden" name="field" value="status" />
               <select name="value"><?php foreach (['todo', 'doing', 'done'] as $value): ?><option value="<?= $value ?>" <?= $task['status'] === $value ? 'selected' : '' ?>><?= $value ?></option><?php endforeach; ?></select>
-              <button class="btn ghost" style="width:100%;margin-top:5px;" type="submit">Status</button>
+              <button class="btn ghost" style="width:100%;margin-top:5px;" type="submit">Move</button>
             </form>
-            <form method="post" action="/?page=task_quick">
+            <form class="inline-form" method="post" action="/?page=task_quick">
               <input type="hidden" name="_token" value="<?= h(csrfToken()) ?>" />
               <input type="hidden" name="task_id" value="<?= (int) $task['id'] ?>" />
               <input type="hidden" name="field" value="priority" />
@@ -650,7 +650,7 @@ ob_start();
               <button class="btn ghost" style="width:100%;margin-top:5px;" type="submit">Priority</button>
             </form>
           </div>
-          <button class="btn secondary" data-open="task-<?= (int) $task['id'] ?>" style="width:100%;margin-top:8px;" type="button">Open details</button>
+          <button class="btn secondary" data-open="task-<?= (int) $task['id'] ?>" style="width:100%;margin-top:8px;" type="button">View issue</button>
         </article>
 
         <section id="task-<?= (int) $task['id'] ?>" class="drawer card">
@@ -675,6 +675,7 @@ ob_start();
       <?php endforeach; ?>
     </section>
   <?php endforeach; ?>
+</div>
 </div>
 
 <button class="btn fab" data-open="newTask" type="button">+</button>
