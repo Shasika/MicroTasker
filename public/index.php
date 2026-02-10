@@ -122,6 +122,11 @@ if (!$user) {
 $user = requireAuth();
 $teamId = activeTeamId($user);
 
+if (in_array($page, ['profile_update', 'password_update'], true) && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+    flash('error', 'Use the Settings page form to update profile or password.');
+    redirect('/?page=settings');
+}
+
 if (isPost('team_create')) {
     $name = trim((string) ($_POST['name'] ?? ''));
     if ($name === '' || mb_strlen($name) > 80) {
