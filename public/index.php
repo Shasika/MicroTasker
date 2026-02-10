@@ -24,7 +24,7 @@ function render(string $title, string $content, ?array $user, ?array $flash): vo
 <body>
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand">MicroTasker</div>
+    <div class="brand">MicroTasker <small>Daily command center</small></div>
     <?php if ($user): ?>
       <div style="display:flex;gap:8px;align-items:center;">
         <span class="badge"><?= h($user['name']) ?></span>
@@ -42,9 +42,9 @@ function render(string $title, string $content, ?array $user, ?array $flash): vo
 </div>
 <?php if ($user): ?>
 <nav class="nav-bottom">
-  <?php $tabs = ['today' => 'Today', 'checkin' => 'Check-in', 'team' => 'Team', 'settings' => 'Settings']; ?>
-  <?php foreach ($tabs as $slug => $label): ?>
-    <a class="<?= $slug === (string) ($_GET['page'] ?? 'today') ? 'active' : '' ?>" href="/?page=<?= $slug ?>"><?= h($label) ?></a>
+  <?php $tabs = ['today' => ['Today','🏠'], 'checkin' => ['Check-in','📝'], 'team' => ['Team','👥'], 'settings' => ['Settings','⚙️']]; ?>
+  <?php foreach ($tabs as $slug => [$label,$icon]): ?>
+    <a class="<?= $slug === (string) ($_GET['page'] ?? 'today') ? 'active' : '' ?>" href="/?page=<?= $slug ?>"><span class="icon"><?= h($icon) ?></span><span><?= h($label) ?></span></a>
   <?php endforeach; ?>
 </nav>
 <?php endif; ?>
@@ -111,11 +111,11 @@ if (!$user && !in_array($page, ['login', 'register'], true)) {
 
 if (!$user) {
     if ($page === 'register') {
-        render('Register', '<div class="card"><h2>Create account</h2><form method="post"><input type="hidden" name="_token" value="' . h(csrfToken()) . '" /><div class="grid"><label>Name<input class="input" name="name" required></label><label>Email<input class="input" type="email" name="email" required></label><label>Password<input class="input" type="password" name="password" minlength="6" required></label><button class="btn">Create account</button><small class="muted">Already have an account? <a href="/?page=login">Login</a></small></div></form></div>', null, $flash);
+        render('Register', '<section class="auth-shell"><div class="auth-hero"><h1>Get your team aligned daily.</h1><p>MicroTasker gives your team a clean board, check-ins, and summary in one place.</p><ul class="auth-points"><li>Focus only on today&amp;rsquo;s work</li><li>Capture blockers early</li><li>Keep everyone accountable</li></ul></div><div class="card glass"><h2 class="page-title">Create account</h2><p class="page-subtitle">Start tracking your daily team flow in minutes.</p><form method="post"><input type="hidden" name="_token" value="' . h(csrfToken()) . '" /><div class="grid"><label>Name<input class="input" name="name" required></label><label>Email<input class="input" type="email" name="email" required></label><label>Password<input class="input" type="password" name="password" minlength="6" required></label><button class="btn">Create account</button><small class="muted">Already have an account? <a href="/?page=login">Login</a></small></div></form></div></section>', null, $flash);
         exit;
     }
 
-    render('Login', '<div class="card"><h2>Sign in</h2><p><small class="muted">Demo: admin@demo.test / password</small></p><form method="post"><input type="hidden" name="_token" value="' . h(csrfToken()) . '" /><div class="grid"><label>Email<input class="input" type="email" name="email" required></label><label>Password<input class="input" type="password" name="password" required></label><button class="btn">Login</button><small class="muted">New here? <a href="/?page=register">Create account</a></small></div></form></div>', null, $flash);
+    render('Login', '<section class="auth-shell"><div class="auth-hero"><h1>Run your standup before standup.</h1><p>Track today&amp;rsquo;s work across your small team with premium clarity.</p><ul class="auth-points"><li>Kanban board for today</li><li>Personal + team check-ins</li><li>Instant health summary</li></ul></div><div class="card glass"><h2 class="page-title">Sign in</h2><p class="page-subtitle">Demo: admin@demo.test / password</p><form method="post"><input type="hidden" name="_token" value="' . h(csrfToken()) . '" /><div class="grid"><label>Email<input class="input" type="email" name="email" required></label><label>Password<input class="input" type="password" name="password" required></label><button class="btn">Login</button><small class="muted">New here? <a href="/?page=register">Create account</a></small></div></form></div></section>', null, $flash);
     exit;
 }
 
